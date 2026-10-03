@@ -1,6 +1,6 @@
 import Foundation
 import Payments
-import PaymentsMockBackend
+import PaymentsTestSupport
 import Testing
 import UIKit
 @testable import Ledger
