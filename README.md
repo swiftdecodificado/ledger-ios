@@ -31,17 +31,16 @@ Requirements: Xcode 16 or later, iOS 17+, Swift 6 language mode. No external dep
 
 | Where | What |
 | --- | --- |
-| `openapi.yaml` | HTTP contract between the app and the backend, including the idempotency rules. |
-| `Sources/Payments/` | Client side: `PaymentIntent`, `PaymentClient`, `HTTPPaymentTransport`, `PaymentStatus`, `PaymentError` and the wire formats. |
-| `Sources/PaymentsMockBackend/` | In-memory server that follows the contract: `MockPaymentHTTPServer` (network, routes, simulated failures), `MockPaymentBackend` (keys, leases, retention) and the ledger. |
-| `Tests/PaymentsTests/` | Client: same key on retry and mapping of HTTP responses. |
-| `Tests/PaymentsMockBackendTests/` | Mock backend: one debit per key, stored decline, crash before commit, expired lease, a run that lost its lease, and a key expired after retention. |
-| `Tests/PaymentsContractTests/` | The contract checked over HTTP, against the mock and, optionally, a real backend. |
-| Root (`*.swift`) | The app: `AppDependencies` (composition), `PaymentViewController`, `PaymentView`, `LabViewController` and `MockServerPanelView`. |
+| `App/` | App lifecycle: `AppDelegate`, `SceneDelegate`, `AppDependencies` (composition) and `Info.plist`. |
+| `Features/Payments/UI/` | `PaymentViewController`, `PaymentView`, `LabViewController` and `MockServerPanelView`. |
+| `Packages/Payments/` | Client side: `PaymentIntent`, `PaymentClient`, `HTTPPaymentTransport`, `PaymentStatus`, `PaymentError` and the wire formats, plus `PaymentsTests` (same key on retry, mapping of HTTP responses). |
+| `Packages/PaymentsTestSupport/` | In-memory server that follows the contract: `MockPaymentHTTPServer` (network, routes, simulated failures), `MockPaymentBackend` (keys, leases, retention) and the ledger, plus `PaymentsTestSupportTests` (one debit per key, stored decline, crash before commit, expired lease, a run that lost its lease, and a key expired after retention). |
+| `ContractTests/` | `PaymentsContractTests`: the contract checked over HTTP, against the mock and, optionally, a real backend. Kept separate from both packages' own test suites. |
+| `Contracts/payments/openapi.yaml` | HTTP contract between the app and the backend, including the idempotency rules. |
 | `LedgerTests/` | Hosted tests: disabled button, recovery through the status check, resend with the same key when the server does not know the attempt, waiting while processing, stopping without resend when the key expired, new payment, and decline. |
 | `LedgerUITests/` | UI tests: lost response and recovery, a second tap on the disabled button, and a new payment. |
 
-The app depends on the local package (`Package.swift`) through the `Payments` and `PaymentsMockBackend` products.
+The app depends on the local packages `Packages/Payments` and `Packages/PaymentsTestSupport` through the `Payments` and `PaymentsTestSupport` products. `PaymentsTestSupport` is development and test infrastructure only: the app links it today because there is no real backend yet, but it carries no production logic.
 
 ## Running
 
@@ -52,8 +51,12 @@ The app depends on the local package (`Package.swift`) through the `Payments` an
 From the terminal:
 
 ```sh
-# package, including the contract tests against the mock
-swift test
+# each package
+(cd Packages/Payments && swift test)
+(cd Packages/PaymentsTestSupport && swift test)
+
+# contract tests, against the mock
+(cd ContractTests && swift test)
 
 # app, hosted tests and UI tests
 xcodebuild -project Ledger.xcodeproj -scheme Ledger \
@@ -86,7 +89,7 @@ Launch arguments (Product › Scheme › Edit Scheme › Arguments):
 
 ## Contract
 
-`openapi.yaml` is the source of truth. In short:
+`Contracts/payments/openapi.yaml` is the source of truth. In short:
 
 | Request | Response | In the app |
 | --- | --- | --- |
@@ -118,11 +121,12 @@ Error codes and names are defined by this contract and may change as `ledger-bff
 1. Run the contract tests against it:
 
    ```sh
-   LEDGERCORE_BASE_URL=http://localhost:8080/v1 swift test --filter PaymentsContractTests
+   cd ContractTests
+   LEDGERCORE_BASE_URL=http://localhost:8080/v1 swift test
    ```
 
    Each test runs against the mock and against the given URL, with fresh keys on every run. Scenarios that depend
-   on injected failures, limit declines or the clock live in `PaymentsMockBackendTests` and only run on the mock.
+   on injected failures, limit declines or the clock live in `PaymentsTestSupportTests` and only run on the mock.
 
 2. Set the `PAYMENTS_BASE_URL` build setting on the `Ledger` target, for example `https://api.example.com/v1`.
    It reaches `Info.plist` as `PaymentsBaseURL`. When it has a value, `AppDependencies` builds
