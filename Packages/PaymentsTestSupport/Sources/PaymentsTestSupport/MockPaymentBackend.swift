@@ -56,7 +56,7 @@ public actor MockPaymentBackend {
     }
 
     private var paymentAttempts: [String: PaymentAttempt] = [:]
-    private var ledger = PaymentLedger()
+    private var ledger = InMemoryPaymentLedger()
     private var crashesBeforeNextCommit = false
     private let configuration: Configuration
     private let now: @Sendable () -> Date

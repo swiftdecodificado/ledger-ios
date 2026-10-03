@@ -51,9 +51,10 @@
 /* Begin PBXGroup section */
 		C10000000000000000000002 = {isa = PBXGroup; children = (C10000000000000000000019 /* Ledger */, C10000000000000000000041 /* LedgerTests */, C1000000000000000000005B /* LedgerUITests */, C10000000000000000000018 /* README.md */, C10000000000000000000003 /* Products */, ); sourceTree = "<group>"; };
 		C10000000000000000000003 /* Products */ = {isa = PBXGroup; children = (C10000000000000000000024 /* Ledger.app */, C10000000000000000000043 /* LedgerTests.xctest */, C10000000000000000000054 /* LedgerUITests.xctest */, ); name = Products; sourceTree = "<group>"; };
-		C10000000000000000000019 /* Ledger */ = {isa = PBXGroup; children = (C10000000000000000000060 /* App */, C10000000000000000000061 /* UI */, ); name = Ledger; sourceTree = "<group>"; };
+		C10000000000000000000019 /* Ledger */ = {isa = PBXGroup; children = (C10000000000000000000060 /* App */, C10000000000000000000061 /* UI */, C10000000000000000000062 /* PaymentLab */, ); name = Ledger; sourceTree = "<group>"; };
 		C10000000000000000000060 /* App */ = {isa = PBXGroup; children = (C10000000000000000000010 /* AppDelegate.swift */, C10000000000000000000011 /* SceneDelegate.swift */, C10000000000000000000012 /* AppDependencies.swift */, C10000000000000000000017 /* Info.plist */, ); path = App; sourceTree = "<group>"; };
-		C10000000000000000000061 /* UI */ = {isa = PBXGroup; children = (C10000000000000000000016 /* LabViewController.swift */, C10000000000000000000013 /* PaymentViewController.swift */, C10000000000000000000014 /* PaymentView.swift */, C10000000000000000000015 /* MockServerPanelView.swift */, ); path = "Features/Payments/UI"; sourceTree = "<group>"; };
+		C10000000000000000000061 /* UI */ = {isa = PBXGroup; children = (C10000000000000000000013 /* PaymentViewController.swift */, C10000000000000000000014 /* PaymentView.swift */, ); path = "Features/Payments/UI"; sourceTree = "<group>"; };
+		C10000000000000000000062 /* PaymentLab */ = {isa = PBXGroup; children = (C10000000000000000000016 /* LabViewController.swift */, C10000000000000000000015 /* MockServerPanelView.swift */, ); path = "Support/PaymentLab"; sourceTree = "<group>"; };
 		C10000000000000000000041 /* LedgerTests */ = {isa = PBXGroup; children = (C10000000000000000000040 /* PaymentViewControllerTests.swift */, ); path = LedgerTests; sourceTree = "<group>"; };
 		C1000000000000000000005B /* LedgerUITests */ = {isa = PBXGroup; children = (C1000000000000000000005A /* LostResponseUITests.swift */, ); path = LedgerUITests; sourceTree = "<group>"; };
 /* End PBXGroup section */

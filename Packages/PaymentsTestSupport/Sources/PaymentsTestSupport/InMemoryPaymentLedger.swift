@@ -23,7 +23,7 @@ struct PaymentResult: Equatable, Sendable {
 }
 
 /// Every call is one debit. Protection against duplicates lives in `MockPaymentBackend`, not here.
-struct PaymentLedger {
+struct InMemoryPaymentLedger {
     private(set) var entries: [LedgerEntry] = []
 
     mutating func debit(_ request: PaymentRequest) -> PaymentResult {
