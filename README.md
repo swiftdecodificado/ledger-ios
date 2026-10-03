@@ -2,19 +2,19 @@
 
 The iOS client of the Ledger Platform.
 
-The first feature implemented here is payment reliability: making sure a payment is charged once, even when the
-network fails or the response never arrives. The current code covers:
+The first feature in this repository focuses on payment reliability: making sure one payment intent does not create more than one financial effect when the network fails or the response never arrives.
 
-- `PaymentIntent`, which keeps the same idempotency key across retries of one payment;
-- idempotent `POST /payments` with an `Idempotency-Key` header;
-- unknown outcomes (timeouts, lost responses, `5xx`) treated as "not confirmed", never as "failed";
-- status recovery through `GET /payment-attempts/{key}` instead of sending a second `POST`;
+The current implementation covers:
+
+- `PaymentIntent`, which keeps the same idempotency key across retries of the same payment;
+- idempotent `POST /payments` requests using the `Idempotency-Key` header;
+- unknown outcomes such as timeouts, lost responses, and `5xx` errors, treated as "not confirmed" instead of "failed";
+- status recovery through `GET /payment-attempts/{key}` before sending another `POST`;
 - a mock backend that follows the same HTTP contract;
 - contract tests that run against the mock and, optionally, against a real backend;
-- failure simulation (lost response, crash before commit, failure after commit).
+- failure simulation, including lost responses, crashes before commit, and failures after commit.
 
-The mock backend is development and test infrastructure. It lets the app and the tests run without a server. It
-is not production backend code.
+The mock backend is development and test infrastructure. It lets the app and test suites run without a real server. It is not production backend code.
 
 Requirements: Xcode 16 or later, iOS 17+, Swift 6 language mode. No external dependencies.
 
@@ -29,112 +29,205 @@ Requirements: Xcode 16 or later, iOS 17+, Swift 6 language mode. No external dep
 
 ## Structure
 
-| Where | What |
+| Path | Responsibility |
 | --- | --- |
-| `App/` | App lifecycle: `AppDelegate`, `SceneDelegate`, `AppDependencies` (composition) and `Info.plist`. |
-| `Features/Payments/UI/` | `PaymentViewController`, `PaymentView`, `LabViewController` and `MockServerPanelView`. |
-| `Packages/Payments/` | Client side: `PaymentIntent`, `PaymentClient`, `HTTPPaymentTransport`, `PaymentStatus`, `PaymentError` and the wire formats, plus `PaymentsTests` (same key on retry, mapping of HTTP responses). |
-| `Packages/PaymentsTestSupport/` | In-memory server that follows the contract: `MockPaymentHTTPServer` (network, routes, simulated failures), `MockPaymentBackend` (keys, leases, retention) and the ledger, plus `PaymentsTestSupportTests` (one debit per key, stored decline, crash before commit, expired lease, a run that lost its lease, and a key expired after retention). |
-| `ContractTests/` | `PaymentsContractTests`: the contract checked over HTTP, against the mock and, optionally, a real backend. Kept separate from both packages' own test suites. |
-| `Contracts/payments/openapi.yaml` | HTTP contract between the app and the backend, including the idempotency rules. |
-| `LedgerTests/` | Hosted tests: disabled button, recovery through the status check, resend with the same key when the server does not know the attempt, waiting while processing, stopping without resend when the key expired, new payment, and decline. |
-| `LedgerUITests/` | UI tests: lost response and recovery, a second tap on the disabled button, and a new payment. |
+| `App/` | App lifecycle and composition: `AppDelegate`, `SceneDelegate`, `AppDependencies`, and `Info.plist`. |
+| `Features/Payments/UI/` | Production payment UI: `PaymentViewController` and `PaymentView`. |
+| `Support/PaymentLab/` | Debug and demo UI: `LabViewController` and `MockServerPanelView`. This is not part of the production feature flow. |
+| `Packages/Payments/` | Production payment code: `PaymentIntent`, `PaymentClient`, `HTTPPaymentTransport`, `PaymentStatus`, `PaymentError`, wire formats, and `PaymentsTests`. This package has no dependencies. |
+| `Packages/PaymentsTestSupport/` | Development and test infrastructure: `MockPaymentHTTPServer`, `MockPaymentBackend`, `InMemoryPaymentLedger`, and `PaymentsTestSupportTests`. This package depends on `Payments`. |
+| `ContractTests/` | `PaymentsContractTests`, which validate the HTTP contract against both the mock and, optionally, a real backend. Kept separate from package tests so contract coverage is not confused with unit coverage. |
+| `Contracts/payments/openapi.yaml` | Payment API contract between the app and the backend, including idempotency rules. |
+| `LedgerTests/` | Hosted app tests for button state, recovery, resend rules, processing state, expiration handling, new payment flows, and declines. |
+| `LedgerUITests/` | UI tests for lost-response recovery, disabled-button behavior, and starting a new payment. |
 
-The app depends on the local packages `Packages/Payments` and `Packages/PaymentsTestSupport` through the `Payments` and `PaymentsTestSupport` products. `PaymentsTestSupport` is development and test infrastructure only: the app links it today because there is no real backend yet, but it carries no production logic.
+The app uses the local `Payments` and `PaymentsTestSupport` packages.
+
+`PaymentsTestSupport` is development and test infrastructure only. The app links it today because there is no real backend yet, but it does not contain production payment rules.
+
+The dependency direction is:
+
+```text
+Payments
+    ↑
+PaymentsTestSupport
+    ↑
+ContractTests
+```
+
+`Payments` has no dependencies. `PaymentsTestSupport` depends on `Payments`, and `ContractTests` depends on both.
 
 ## Running
 
-1. Open `Ledger.xcodeproj` and select the `Ledger` scheme.
-2. Pick an iPhone simulator and run with ⌘R.
-3. ⌘U runs the hosted tests and the UI tests.
+1. Open `Ledger.xcodeproj`.
+2. Select the `Ledger` scheme.
+3. Choose an iPhone simulator and run with `⌘R`.
+4. Use `⌘U` to run hosted tests and UI tests.
 
 From the terminal:
 
 ```sh
-# each package
-(cd Packages/Payments && swift test)
-(cd Packages/PaymentsTestSupport && swift test)
+# Payments package
+swift test --package-path Packages/Payments
 
-# contract tests, against the mock
-(cd ContractTests && swift test)
+# Payments test support
+swift test --package-path Packages/PaymentsTestSupport
 
-# app, hosted tests and UI tests
-xcodebuild -project Ledger.xcodeproj -scheme Ledger \
+# Contract tests against the mock
+swift test --package-path ContractTests
+
+# App, hosted tests, and UI tests
+xcodebuild \
+  -project Ledger.xcodeproj \
+  -scheme Ledger \
   -destination 'platform=iOS Simulator,name=iPhone 13 Pro Max' \
-  CODE_SIGNING_ALLOWED=NO test
+  CODE_SIGNING_ALLOWED=NO \
+  test
 ```
 
-Use a simulator that exists in your installation. If `xcode-select` points to the Command Line Tools, prefix the
-commands with `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer`.
+Use a simulator that exists in your local Xcode installation.
 
-### Mock backend
+If `xcode-select` points to Command Line Tools, prefix the command with:
 
-By default the mock processes the first payment and loses the response. The app shows "Não foi possível confirmar
-o pagamento". On the next tap ("Verificar pagamento") it checks the attempt for that key instead of sending another
-`POST`, finds the payment and shows the receipt. The "Servidor simulado" panel shows 1 `POST`, 1 status check and
-1 debit in the ledger.
+```sh
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
+```
 
-The "Falha no próximo POST" picker in the panel chooses what happens to the next payment:
+## Mock backend
 
-- **Perder resposta** (lose response): the server debits, but the response never arrives. The status check finds
-  the payment.
-- **Queda antes** (crash before commit): the server reserves the key and crashes before debiting. The status check
-  returns "processing" until the lease expires (5 s in the app). After that, recovery resends with the same key.
+By default, the mock processes the first payment and loses the response.
 
-Launch arguments (Product › Scheme › Edit Scheme › Arguments):
+The app shows:
 
-- `-MockFirstFault none | loseResponse | crashBeforeCommit | failAfterCommit` (default `loseResponse`).
-- `-MockDelayMilliseconds 0`: network and processing latency (default 600 ms each).
-- `-MockLeaseSeconds 30`: how long a lease without a result lasts (default 5 s in the app, 30 s in the contract).
+```text
+Não foi possível confirmar o pagamento
+```
+
+On the next tap, the action changes to "Verificar pagamento". The app checks the payment attempt using the same idempotency key instead of sending another `POST`.
+
+If the server already completed the payment, the app shows the receipt.
+
+The "Servidor simulado" panel shows:
+
+- 1 `POST`
+- 1 status check
+- 1 debit in the ledger
+
+The "Falha no próximo POST" picker controls what happens to the next payment request.
+
+### Lose response
+
+The server commits the debit, but the response never reaches the app.
+
+The status lookup finds the payment later.
+
+### Crash before commit
+
+The server reserves the idempotency key and stops before creating a financial effect.
+
+The status lookup returns `processing` until the reservation expires. After that, recovery may send the same `POST` again with the same key.
+
+### Launch arguments
+
+Use Product → Scheme → Edit Scheme → Arguments.
+
+Available options:
+
+```text
+-MockFirstFault none | loseResponse | crashBeforeCommit | failAfterCommit
+```
+
+Default:
+
+```text
+loseResponse
+```
+
+Network and processing delay:
+
+```text
+-MockDelayMilliseconds 0
+```
+
+Default: 600 ms for each simulated step.
+
+Reservation duration:
+
+```text
+-MockLeaseSeconds 30
+```
+
+The app currently uses 5 seconds for faster local feedback. The contract uses 30 seconds.
 
 ## Contract
 
-`Contracts/payments/openapi.yaml` is the source of truth. In short:
+`Contracts/payments/openapi.yaml` is the source of truth for the payment API.
 
-| Request | Response | In the app |
+### Create payment
+
+| Request | Response | App behavior |
 | --- | --- | --- |
-| `POST /payments` with `Idempotency-Key` | `201` with the payment. Same key and same body return the same status and body, with `Idempotent-Replayed: true`. | Receipt |
-| | `402` final decline, stored and replayed for the same key | Decline; the next try is a new intent |
-| | `409` the same key is still processing | Not confirmed |
-| | `410` the key is past its retention period (not processed again) | Not confirmed |
-| | `422` the key was already used with a different body | Decline |
-| | `400` missing header or invalid body (key is not reserved) | Decline |
-| | `5xx`, timeout, lost connection, unreadable `2xx` | Not confirmed |
-| `GET /payment-attempts/{key}` | `200` with `processing`, `succeeded` (with the payment) or `declined` (with the error) | Wait, receipt or decline |
-| | `404` nothing was debited with this key (never arrived, or lease abandoned) | Resend the `POST` with the same key |
-| | `410` the key existed, but the result was dropped after retention | No resend. Tells the user it cannot confirm and offers a new payment |
+| `POST /payments` with `Idempotency-Key` | `201` with the payment. Repeating the same key with the same body returns the same result with `Idempotent-Replayed: true`. | Show receipt |
+| | `402` final decline, stored and replayed for the same key | Show decline; the next attempt is a new payment intent |
+| | `409` the same key is still processing | Keep the result as not confirmed |
+| | `410` the key is past its retention period | Do not resend automatically |
+| | `422` the key was already used with a different body | Treat as a rejected request |
+| | `400` missing header or invalid body | Treat as a rejected request |
+| | `5xx`, timeout, lost connection, or unreadable `2xx` | Treat as not confirmed |
 
-Rules the backend must guarantee, all covered by the mock and the tests:
+### Check payment attempt
 
-- reserve the key with a uniqueness check before processing;
-- debit and store the result in the same transaction;
-- expire leases without a result (30 s) and only let the lease owner store the result;
-- compare the whole body when a key is reused;
-- do not store validation errors (`400`);
-- keep the result of completed keys for 24 h. After that, keep remembering that the key existed and return `410` on
-  both the status check and the `POST`, so the same key never becomes a new payment.
+| Request | Response | App behavior |
+| --- | --- | --- |
+| `GET /payment-attempts/{key}` | `200` with `processing` | Wait and keep the same intent |
+| | `200` with `succeeded` and payment data | Show receipt |
+| | `200` with `declined` and error data | Show decline |
+| | `404` no financial effect exists for this key | Send the same `POST` again with the same key |
+| | `410` the key existed, but its stored result expired | Do not resend automatically |
 
-Error codes and names are defined by this contract and may change as `ledger-bff` and `ledger-core` evolve.
+The backend must guarantee:
+
+- reserve the idempotency key before processing, with a uniqueness check;
+- commit the financial effect and stored result atomically;
+- expire reservations that have no result;
+- allow only the active reservation owner to store the result;
+- compare the complete request body when a key is reused;
+- avoid storing validation errors (`400`);
+- keep completed results for 24 hours;
+- keep a tombstone after result expiration so the same key does not silently become a new payment during that period.
+
+Error codes and names are defined by this contract and may evolve as `ledger-bff` and `ledger-core` are implemented.
 
 ## Connecting to a real backend
 
-1. Run the contract tests against it:
+### Run contract tests
 
-   ```sh
-   cd ContractTests
-   LEDGERCORE_BASE_URL=http://localhost:8080/v1 swift test
-   ```
+```sh
+cd ContractTests
+LEDGERCORE_BASE_URL=http://localhost:8080/v1 swift test
+```
 
-   Each test runs against the mock and against the given URL, with fresh keys on every run. Scenarios that depend
-   on injected failures, limit declines or the clock live in `PaymentsTestSupportTests` and only run on the mock.
+Each test runs with fresh idempotency keys.
 
-2. Set the `PAYMENTS_BASE_URL` build setting on the `Ledger` target, for example `https://api.example.com/v1`.
-   It reaches `Info.plist` as `PaymentsBaseURL`. When it has a value, `AppDependencies` builds
-   `HTTPPaymentTransport` on top of `URLSession` and the mock panel is hidden. When it is empty, the app uses
-   `MockPaymentHTTPServer`.
+Scenarios that depend on injected failures, limit-based declines, or the test clock remain in `PaymentsTestSupportTests` and only run against the mock.
+
+### Run the app against a real backend
+
+Set the `PAYMENTS_BASE_URL` build setting on the `Ledger` target.
+
+Example:
+
+```text
+https://api.example.com/v1
+```
+
+The value reaches `Info.plist` as `PaymentsBaseURL`.
+
+When `PaymentsBaseURL` has a value, `AppDependencies` creates `HTTPPaymentTransport` using `URLSession`, and the mock panel is hidden.
+
+When it is empty, the app uses `MockPaymentHTTPServer`.
 
 ## Known limits
 
-- The `PaymentIntent` lives in the view controller. If the process dies after a timeout, the key is lost. The app
-  may need to persist it until the result is known.
-- Recovery happens when the user taps "Verificar pagamento". The app does not check the status on its own.
+- `PaymentIntent` currently lives in the view controller. If the process dies after an unknown result, the idempotency key is lost. The app may need to persist the intent until the final result is known.
+- Recovery currently starts when the user taps "Verificar pagamento". The app does not poll the payment status automatically.

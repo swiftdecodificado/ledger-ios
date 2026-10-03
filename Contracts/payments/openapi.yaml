@@ -1,36 +1,51 @@
 openapi: 3.1.0
+
 info:
   title: Payments
   version: 1.0.0
   description: |
-    Contrato entre o app e o backend de pagamentos. `MockPaymentHTTPServer` o implementa em memória;
-    um backend real que o cumpra substitui o mock sem mudanças no app. `Tests/PaymentsContractTests`
-    verifica os dois lados.
+    Contract between the app and the payment backend.
 
-    Regras de idempotência:
+    `MockPaymentHTTPServer` provides an in-memory implementation of this contract.
+    A real backend can replace the mock without requiring changes in the app, as long as
+    it follows the same behavior.
 
-    - Cada chave identifica uma intenção de pagamento. O servidor reserva a chave antes de processar,
-      com garantia de unicidade (por exemplo, uma constraint única).
-    - Débito e registro do resultado acontecem na mesma transação. Não existe estado em que o dinheiro
-      moveu e a chave ficou sem resultado.
-    - Mesma chave e mesmo corpo depois de concluída: o servidor devolve o mesmo status e o mesmo corpo,
-      com `Idempotent-Replayed: true`, sem processar de novo. Vale para sucesso (201) e para recusa (402).
-    - Mesma chave com outro corpo: 422. A comparação usa todos os campos do corpo.
-    - Mesma chave enquanto a primeira ainda processa: 409.
-    - Erros de validação (400) não reservam nem guardam a chave.
-    - Uma reserva sem resultado expira após o prazo de processamento (30 s). Depois disso a tentativa é
-      considerada abandonada e a chave pode ser processada de novo. Só o dono da reserva pode gravar o
-      resultado; uma execução cuja reserva expirou não debita.
-    - O resultado de uma chave concluída é guardado por 24 h. Depois disso o servidor descarta o resultado,
-      mas continua lembrando que a chave existiu: GET e POST com ela respondem 410. A mesma chave nunca
-      representa um pagamento novo.
-    - 404 na consulta significa que nada foi debitado com a chave (nunca chegou ou a reserva expirou sem
-      resultado). É o único caso em que reenviar com a mesma chave é seguro.
+    `PaymentsContractTests` validates both implementations.
+
+    Idempotency rules:
+
+    - Each idempotency key identifies one payment intent.
+    - The server reserves the key before processing, using a uniqueness guarantee such
+      as a database unique constraint.
+    - The financial effect and the stored result are committed atomically.
+      There must not be a state where money was moved but the key has no stored result.
+    - Reusing the same key with the same request after completion returns the same status
+      and response body with `Idempotent-Replayed: true`.
+      This applies to successful payments (201) and declined payments (402).
+    - Reusing the same key with a different request returns 422.
+      The comparison uses the complete request body.
+    - Reusing the same key while the first request is still processing returns 409.
+    - Validation errors (400) do not reserve or store the key.
+    - A reservation without a result expires after 30 seconds.
+      After that, the attempt is considered abandoned and the key may be processed again.
+    - Only the owner of the active reservation may commit the result.
+      A slow execution that lost its reservation must not create a financial effect.
+    - Completed results are kept for 24 hours.
+    - After the result expires, the server keeps a tombstone for the key for 30 days.
+      During this period, GET and POST requests with the same key return 410.
+    - A 404 response from the lookup endpoint means no financial effect exists for that key.
+      This is the only case where retrying the POST with the same key is safe.
+
 servers:
-  - url: https://api.exemplo.com/v1
+  - url: http://localhost:8080/v1
+    description: Local LedgerCore
+    
+security: []
+
 paths:
   /payments:
     post:
+      summary: Create a payment
       operationId: createPayment
       parameters:
         - $ref: "#/components/parameters/IdempotencyKey"
@@ -42,7 +57,9 @@ paths:
               $ref: "#/components/schemas/PaymentRequest"
       responses:
         "201":
-          description: Pagamento criado, ou a repetição de uma criação anterior com a mesma chave.
+          description: |
+            Payment created successfully, or a replay of a previous successful request
+            using the same idempotency key and request body.
           headers:
             Idempotent-Replayed:
               $ref: "#/components/headers/IdempotentReplayed"
@@ -50,14 +67,20 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Payment"
+
         "400":
-          description: "Cabeçalho ausente ou corpo inválido (`missing_idempotency_key`, `invalid_body`). Não guardado."
+          description: |
+            Invalid request, such as a missing idempotency key or invalid request body.
+            The key is not reserved or stored.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+
         "402":
-          description: "Recusa definitiva (`amount_exceeds_limit`). Guardada e repetida para a mesma chave."
+          description: |
+            The payment was declined. The result is stored and returned again when the
+            same key is replayed with the same request.
           headers:
             Idempotent-Replayed:
               $ref: "#/components/headers/IdempotentReplayed"
@@ -65,36 +88,50 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+
         "409":
-          description: "Outra request com a mesma chave ainda está em processamento (`request_in_progress`)."
+          description: |
+            Another request using the same idempotency key is still being processed.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-        "422":
-          description: "A chave já foi usada com outro corpo (`idempotency_key_reused`)."
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+
         "410":
           description: |
-            A chave passou do prazo de retenção (`idempotency_key_expired`). O servidor não processa de novo
-            nem informa o resultado anterior. Para o cliente, o resultado continua desconhecido.
+            The idempotency key is known, but its stored result has expired.
+            The server does not process the payment again and cannot return the previous result.
+            The client must treat the payment outcome as unknown.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+
+        "422":
+          description: |
+            The idempotency key was already used with a different request body.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
         "500":
-          description: Erro interno. O cliente não sabe se houve débito e deve consultar a tentativa.
+          description: |
+            Internal server error.
+            The client cannot know if a financial effect happened and should check
+            the payment attempt status before retrying.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+
   /payment-attempts/{idempotencyKey}:
     get:
+      summary: Get payment attempt status
       operationId: getPaymentAttempt
-      description: Estado da tentativa associada à chave. Usado na recuperação depois de um resultado desconhecido.
+      description: |
+        Returns the current state of the payment attempt linked to the idempotency key.
+        This endpoint is used to recover after an unknown payment result.
       parameters:
         - name: idempotencyKey
           in: path
@@ -105,28 +142,36 @@ paths:
             maxLength: 255
       responses:
         "200":
-          description: A chave é conhecida.
+          description: The idempotency key is known.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaymentAttempt"
+
         "404":
           description: |
-            Nenhuma tentativa com essa chave (`not_found`): a request nunca chegou ou foi abandonada (reserva
-            expirada sem resultado). Nada foi debitado, então um POST com a mesma chave é seguro.
+            No payment attempt exists for this key.
+            The original request either never reached the server or its reservation expired
+            before any financial effect was committed.
+
+            No debit exists for this key, so retrying the POST with the same key is safe.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+
         "410":
           description: |
-            A chave existiu, mas passou do prazo de retenção (`idempotency_key_expired`). O resultado foi
-            descartado: o pagamento pode ter sido concluído. Reenviar não é seguro, e um POST com a mesma
-            chave também responde 410.
+            The key existed, but its result is no longer available because the retention
+            period expired.
+
+            The original payment may have completed successfully.
+            Retrying is not safe, and POST requests using the same key also return 410.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+
 components:
   parameters:
     IdempotencyKey:
@@ -137,17 +182,23 @@ components:
         type: string
         minLength: 1
         maxLength: 255
+
   headers:
     IdempotentReplayed:
-      description: "`true` quando a resposta é a repetição de um resultado guardado."
+      description: |
+        Present with value `true` when the response is a replay of a previously stored result.
       schema:
         type: string
-        enum: ["true"]
+        enum:
+          - "true"
+
   schemas:
     PaymentRequest:
       type: object
-      required: [cents, destinationAccountID]
       additionalProperties: false
+      required:
+        - cents
+        - destinationAccountID
       properties:
         cents:
           type: integer
@@ -155,38 +206,87 @@ components:
         destinationAccountID:
           type: string
           minLength: 1
+
     Payment:
       type: object
-      required: [id, cents, destinationAccountID]
+      additionalProperties: false
+      required:
+        - id
+        - cents
+        - destinationAccountID
       properties:
         id:
           type: string
         cents:
           type: integer
+          minimum: 1
         destinationAccountID:
           type: string
+          minLength: 1
+
     PaymentAttempt:
+      oneOf:
+        - $ref: "#/components/schemas/ProcessingPaymentAttempt"
+        - $ref: "#/components/schemas/SucceededPaymentAttempt"
+        - $ref: "#/components/schemas/DeclinedPaymentAttempt"
+      discriminator:
+        propertyName: status
+        mapping:
+          processing: "#/components/schemas/ProcessingPaymentAttempt"
+          succeeded: "#/components/schemas/SucceededPaymentAttempt"
+          declined: "#/components/schemas/DeclinedPaymentAttempt"
+
+    ProcessingPaymentAttempt:
       type: object
-      required: [status]
+      additionalProperties: false
+      required:
+        - status
       properties:
         status:
           type: string
-          enum: [processing, succeeded, declined]
+          const: processing
+
+    SucceededPaymentAttempt:
+      type: object
+      additionalProperties: false
+      required:
+        - status
+        - payment
+      properties:
+        status:
+          type: string
+          const: succeeded
         payment:
           $ref: "#/components/schemas/Payment"
-          description: Presente quando `status` é `succeeded`.
+
+    DeclinedPaymentAttempt:
+      type: object
+      additionalProperties: false
+      required:
+        - status
+        - error
+      properties:
+        status:
+          type: string
+          const: declined
         error:
           $ref: "#/components/schemas/ErrorDetail"
-          description: Presente quando `status` é `declined`.
+
     Error:
       type: object
-      required: [error]
+      additionalProperties: false
+      required:
+        - error
       properties:
         error:
           $ref: "#/components/schemas/ErrorDetail"
+
     ErrorDetail:
       type: object
-      required: [code, message]
+      additionalProperties: false
+      required:
+        - code
+        - message
       properties:
         code:
           type: string
