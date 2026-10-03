@@ -1,0 +1,108 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 60;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		C10000000000000000000110 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000010 /* AppDelegate.swift */; };
+		C10000000000000000000111 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000011 /* SceneDelegate.swift */; };
+		C10000000000000000000112 /* AppDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000012 /* AppDependencies.swift */; };
+		C10000000000000000000113 /* PaymentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000013 /* PaymentViewController.swift */; };
+		C10000000000000000000114 /* PaymentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000014 /* PaymentView.swift */; };
+		C10000000000000000000115 /* MockServerPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000015 /* MockServerPanelView.swift */; };
+		C10000000000000000000116 /* LabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000016 /* LabViewController.swift */; };
+		C100000000000000000000A3 /* Payments in Frameworks */ = {isa = PBXBuildFile; productRef = C100000000000000000000A1 /* Payments */; };
+		C100000000000000000000A4 /* PaymentsMockBackend in Frameworks */ = {isa = PBXBuildFile; productRef = C100000000000000000000A2 /* PaymentsMockBackend */; };
+		C10000000000000000000042 /* PaymentViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000040 /* PaymentViewControllerTests.swift */; };
+		C1000000000000000000005C /* LostResponseUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1000000000000000000005A /* LostResponseUITests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C1000000000000000000004A /* PBXContainerItemProxy */ = {isa = PBXContainerItemProxy; containerPortal = C10000000000000000000001 /* Project object */; proxyType = 1; remoteGlobalIDString = C10000000000000000000020; remoteInfo = Ledger; };
+		C10000000000000000000058 /* PBXContainerItemProxy */ = {isa = PBXContainerItemProxy; containerPortal = C10000000000000000000001 /* Project object */; proxyType = 1; remoteGlobalIDString = C10000000000000000000020; remoteInfo = Ledger; };
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		C10000000000000000000010 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		C10000000000000000000011 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		C10000000000000000000012 /* AppDependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDependencies.swift; sourceTree = "<group>"; };
+		C10000000000000000000013 /* PaymentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentViewController.swift; sourceTree = "<group>"; };
+		C10000000000000000000014 /* PaymentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentView.swift; sourceTree = "<group>"; };
+		C10000000000000000000015 /* MockServerPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockServerPanelView.swift; sourceTree = "<group>"; };
+		C10000000000000000000016 /* LabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabViewController.swift; sourceTree = "<group>"; };
+		C10000000000000000000017 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C10000000000000000000018 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		C10000000000000000000024 /* Ledger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Ledger.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C10000000000000000000040 /* PaymentViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentViewControllerTests.swift; sourceTree = "<group>"; };
+		C10000000000000000000043 /* LedgerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LedgerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C10000000000000000000054 /* LedgerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LedgerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C1000000000000000000005A /* LostResponseUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LostResponseUITests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		C10000000000000000000022 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (C100000000000000000000A3 /* Payments in Frameworks */, C100000000000000000000A4 /* PaymentsMockBackend in Frameworks */, ); runOnlyForDeploymentPostprocessing = 0; };
+		C10000000000000000000046 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		C10000000000000000000052 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		C10000000000000000000002 = {isa = PBXGroup; children = (C10000000000000000000019 /* Ledger */, C10000000000000000000041 /* LedgerTests */, C1000000000000000000005B /* LedgerUITests */, C10000000000000000000018 /* README.md */, C10000000000000000000003 /* Products */, ); sourceTree = "<group>"; };
+		C10000000000000000000003 /* Products */ = {isa = PBXGroup; children = (C10000000000000000000024 /* Ledger.app */, C10000000000000000000043 /* LedgerTests.xctest */, C10000000000000000000054 /* LedgerUITests.xctest */, ); name = Products; sourceTree = "<group>"; };
+		C10000000000000000000019 /* Ledger */ = {isa = PBXGroup; children = (C10000000000000000000010 /* AppDelegate.swift */, C10000000000000000000011 /* SceneDelegate.swift */, C10000000000000000000012 /* AppDependencies.swift */, C10000000000000000000016 /* LabViewController.swift */, C10000000000000000000013 /* PaymentViewController.swift */, C10000000000000000000014 /* PaymentView.swift */, C10000000000000000000015 /* MockServerPanelView.swift */, C10000000000000000000017 /* Info.plist */, ); name = Ledger; sourceTree = "<group>"; };
+		C10000000000000000000041 /* LedgerTests */ = {isa = PBXGroup; children = (C10000000000000000000040 /* PaymentViewControllerTests.swift */, ); path = LedgerTests; sourceTree = "<group>"; };
+		C1000000000000000000005B /* LedgerUITests */ = {isa = PBXGroup; children = (C1000000000000000000005A /* LostResponseUITests.swift */, ); path = LedgerUITests; sourceTree = "<group>"; };
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C10000000000000000000020 /* Ledger */ = {isa = PBXNativeTarget; buildConfigurationList = C10000000000000000000025 /* Build configuration list for PBXNativeTarget "Ledger" */; buildPhases = (C10000000000000000000021 /* Sources */, C10000000000000000000022 /* Frameworks */, ); buildRules = (); dependencies = (); name = Ledger; packageProductDependencies = (C100000000000000000000A1 /* Payments */, C100000000000000000000A2 /* PaymentsMockBackend */, ); productName = Ledger; productReference = C10000000000000000000024 /* Ledger.app */; productType = "com.apple.product-type.application"; };
+		C10000000000000000000044 /* LedgerTests */ = {isa = PBXNativeTarget; buildConfigurationList = C10000000000000000000047 /* Build configuration list for PBXNativeTarget "LedgerTests" */; buildPhases = (C10000000000000000000045 /* Sources */, C10000000000000000000046 /* Frameworks */, ); buildRules = (); dependencies = (C1000000000000000000004B /* PBXTargetDependency */, ); name = LedgerTests; productName = LedgerTests; productReference = C10000000000000000000043 /* LedgerTests.xctest */; productType = "com.apple.product-type.bundle.unit-test"; };
+		C10000000000000000000050 /* LedgerUITests */ = {isa = PBXNativeTarget; buildConfigurationList = C10000000000000000000055 /* Build configuration list for PBXNativeTarget "LedgerUITests" */; buildPhases = (C10000000000000000000051 /* Sources */, C10000000000000000000052 /* Frameworks */, ); buildRules = (); dependencies = (C10000000000000000000059 /* PBXTargetDependency */, ); name = LedgerUITests; productName = LedgerUITests; productReference = C10000000000000000000054 /* LedgerUITests.xctest */; productType = "com.apple.product-type.bundle.ui-testing"; };
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		C10000000000000000000001 /* Project object */ = {isa = PBXProject; attributes = {BuildIndependentTargetsInParallel = 1; LastSwiftUpdateCheck = 2700; LastUpgradeCheck = 2700; TargetAttributes = {C10000000000000000000044 = {TestTargetID = C10000000000000000000020; }; C10000000000000000000050 = {TestTargetID = C10000000000000000000020; }; }; }; buildConfigurationList = C10000000000000000000004 /* Build configuration list for PBXProject "Ledger" */; compatibilityVersion = "Xcode 15.0"; developmentRegion = pt; hasScannedForEncodings = 0; knownRegions = (pt, en, Base, ); mainGroup = C10000000000000000000002; packageReferences = (C100000000000000000000A0 /* XCLocalSwiftPackageReference "." */, ); productRefGroup = C10000000000000000000003 /* Products */; projectDirPath = ""; projectRoot = ""; targets = (C10000000000000000000020 /* Ledger */, C10000000000000000000044 /* LedgerTests */, C10000000000000000000050 /* LedgerUITests */, ); };
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		C10000000000000000000021 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (C10000000000000000000110 /* AppDelegate.swift in Sources */, C10000000000000000000111 /* SceneDelegate.swift in Sources */, C10000000000000000000112 /* AppDependencies.swift in Sources */, C10000000000000000000113 /* PaymentViewController.swift in Sources */, C10000000000000000000114 /* PaymentView.swift in Sources */, C10000000000000000000115 /* MockServerPanelView.swift in Sources */, C10000000000000000000116 /* LabViewController.swift in Sources */, ); runOnlyForDeploymentPostprocessing = 0; };
+		C10000000000000000000045 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (C10000000000000000000042 /* PaymentViewControllerTests.swift in Sources */, ); runOnlyForDeploymentPostprocessing = 0; };
+		C10000000000000000000051 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (C1000000000000000000005C /* LostResponseUITests.swift in Sources */, ); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		C1000000000000000000004B /* PBXTargetDependency */ = {isa = PBXTargetDependency; target = C10000000000000000000020 /* Ledger */; targetProxy = C1000000000000000000004A /* PBXContainerItemProxy */; };
+		C10000000000000000000059 /* PBXTargetDependency */ = {isa = PBXTargetDependency; target = C10000000000000000000020 /* Ledger */; targetProxy = C10000000000000000000058 /* PBXContainerItemProxy */; };
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		C10000000000000000000005 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {CLANG_ENABLE_MODULES = YES; DEBUG_INFORMATION_FORMAT = dwarf; ENABLE_TESTABILITY = YES; IPHONEOS_DEPLOYMENT_TARGET = 17.0; ONLY_ACTIVE_ARCH = YES; SDKROOT = iphoneos; SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG; SWIFT_OPTIMIZATION_LEVEL = "-Onone"; SWIFT_VERSION = 6.0; }; name = Debug; };
+		C10000000000000000000006 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {CLANG_ENABLE_MODULES = YES; DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym"; IPHONEOS_DEPLOYMENT_TARGET = 17.0; SDKROOT = iphoneos; SWIFT_COMPILATION_MODE = wholemodule; SWIFT_VERSION = 6.0; VALIDATE_PRODUCT = YES; }; name = Release; };
+		C10000000000000000000026 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {CODE_SIGN_STYLE = Automatic; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_FILE = Info.plist; INFOPLIST_KEY_CFBundleDisplayName = Ledger; INFOPLIST_KEY_UILaunchScreen_Generation = YES; INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks", ); MARKETING_VERSION = 1.0; CURRENT_PROJECT_VERSION = 1; PAYMENTS_BASE_URL = ""; PRODUCT_BUNDLE_IDENTIFIER = com.swiftdecodificado.ledger; PRODUCT_NAME = "$(TARGET_NAME)"; TARGETED_DEVICE_FAMILY = 1; }; name = Debug; };
+		C10000000000000000000027 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {CODE_SIGN_STYLE = Automatic; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_FILE = Info.plist; INFOPLIST_KEY_CFBundleDisplayName = Ledger; INFOPLIST_KEY_UILaunchScreen_Generation = YES; INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks", ); MARKETING_VERSION = 1.0; CURRENT_PROJECT_VERSION = 1; PAYMENTS_BASE_URL = ""; PRODUCT_BUNDLE_IDENTIFIER = com.swiftdecodificado.ledger; PRODUCT_NAME = "$(TARGET_NAME)"; TARGETED_DEVICE_FAMILY = 1; }; name = Release; };
+		C10000000000000000000048 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {BUNDLE_LOADER = "$(TEST_HOST)"; CODE_SIGN_STYLE = Automatic; GENERATE_INFOPLIST_FILE = YES; PRODUCT_BUNDLE_IDENTIFIER = com.swiftdecodificado.ledger.Tests; PRODUCT_NAME = "$(TARGET_NAME)"; TARGETED_DEVICE_FAMILY = 1; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Ledger.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Ledger"; }; name = Debug; };
+		C10000000000000000000049 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {BUNDLE_LOADER = "$(TEST_HOST)"; CODE_SIGN_STYLE = Automatic; GENERATE_INFOPLIST_FILE = YES; PRODUCT_BUNDLE_IDENTIFIER = com.swiftdecodificado.ledger.Tests; PRODUCT_NAME = "$(TARGET_NAME)"; TARGETED_DEVICE_FAMILY = 1; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Ledger.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Ledger"; }; name = Release; };
+		C10000000000000000000056 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {CODE_SIGN_STYLE = Automatic; GENERATE_INFOPLIST_FILE = YES; PRODUCT_BUNDLE_IDENTIFIER = com.swiftdecodificado.ledger.UITests; PRODUCT_NAME = "$(TARGET_NAME)"; TARGETED_DEVICE_FAMILY = 1; TEST_TARGET_NAME = Ledger; }; name = Debug; };
+		C10000000000000000000057 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {CODE_SIGN_STYLE = Automatic; GENERATE_INFOPLIST_FILE = YES; PRODUCT_BUNDLE_IDENTIFIER = com.swiftdecodificado.ledger.UITests; PRODUCT_NAME = "$(TARGET_NAME)"; TARGETED_DEVICE_FAMILY = 1; TEST_TARGET_NAME = Ledger; }; name = Release; };
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C10000000000000000000004 /* Build configuration list for PBXProject "Ledger" */ = {isa = XCConfigurationList; buildConfigurations = (C10000000000000000000005 /* Debug */, C10000000000000000000006 /* Release */, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		C10000000000000000000025 /* Build configuration list for PBXNativeTarget "Ledger" */ = {isa = XCConfigurationList; buildConfigurations = (C10000000000000000000026 /* Debug */, C10000000000000000000027 /* Release */, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		C10000000000000000000047 /* Build configuration list for PBXNativeTarget "LedgerTests" */ = {isa = XCConfigurationList; buildConfigurations = (C10000000000000000000048 /* Debug */, C10000000000000000000049 /* Release */, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		C10000000000000000000055 /* Build configuration list for PBXNativeTarget "LedgerUITests" */ = {isa = XCConfigurationList; buildConfigurations = (C10000000000000000000056 /* Debug */, C10000000000000000000057 /* Release */, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		C100000000000000000000A0 /* XCLocalSwiftPackageReference "." */ = {isa = XCLocalSwiftPackageReference; relativePath = .; };
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C100000000000000000000A1 /* Payments */ = {isa = XCSwiftPackageProductDependency; productName = Payments; };
+		C100000000000000000000A2 /* PaymentsMockBackend */ = {isa = XCSwiftPackageProductDependency; productName = PaymentsMockBackend; };
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = C10000000000000000000001 /* Project object */;
+}
